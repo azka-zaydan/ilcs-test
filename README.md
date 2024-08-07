@@ -25,8 +25,8 @@ The Task API provides functionalities to update, get, delete, and retrieve tasks
 
 1. **Clone the repository**:
     ```bash
-    git clone https://github.com/yourusername/your-repo-name.git
-    cd your-repo-name
+    git clone https://github.com/azka-zaydan/ilcs-test.git
+    cd ilcs-test
     ```
 
 2. **Copy the example environment file**:

@@ -1,0 +1,30 @@
+services:
+  ilcs-oracle-db:
+    image: oracle/database:19.3.0-ee
+    container_name: oracle-db
+    ports:
+      - "1521:1521"
+      - "5500:5500"
+    environment:
+      - ORACLE_SID=ORCLCDB
+      - ORACLE_PDB=ORCLILCS
+      - ORACLE_PWD=password
+      - ORACLE_CHARACTERSET=AL32UTF8
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+    restart: always
+
+  ilcs-redis:
+    image: redis:latest
+    container_name: ilcs-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - /home/$USER:/root/redis
+    environment:
+      REDIS_PORT: "6379"
+      REDIS_DATABASES: "16"
+volumes:
+  oracle-data:
+    driver: local

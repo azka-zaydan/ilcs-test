@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { Task } from "..";
+import { Failure } from "../../../../shared/failure";
 import { generateV4 } from "../../../../shared/uuid";
 
 export const createTaskRequest = z.object({
@@ -17,6 +18,7 @@ export const updateTaskRequest = z.object({
 });
 
 export type createTaskRequest = z.infer<typeof createTaskRequest>;
+export type updateTaskRequest = z.infer<typeof updateTaskRequest>;
 
 export function createReqToModel(req: createTaskRequest) {
 	const createdTime = new Date();
@@ -33,12 +35,39 @@ export function createReqToModel(req: createTaskRequest) {
 	return task;
 }
 
+export function updateReqToModel(req: updateTaskRequest, taskId: string) {
+	const updatedTime = new Date();
+	const task: Task = {
+		id: taskId,
+		title: req.title,
+		description: req.description || null,
+		status: req.status,
+		updatedBy: req.updatedBy,
+		updatedAt: updatedTime,
+	};
+	return task;
+}
+
 export type getAllTaskResult = {
-	tasks?: Promise<Task[]>;
-	error?: Error;
+	tasks?: Task[];
+	failure?: Failure;
 };
 
 export type createTaskResult = {
 	task?: Task;
-	error?: Error;
+	failure?: Failure;
+};
+
+export type updateTaskResult = {
+	task?: Task;
+	failure?: Failure;
+};
+
+export type getTaskByIDResult = {
+	task?: Task;
+	failure?: Failure;
+};
+
+export type deleteTaskByIDResult = {
+	failure?: Failure;
 };

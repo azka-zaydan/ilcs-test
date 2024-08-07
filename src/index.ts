@@ -5,8 +5,8 @@ import Logger from "./shared/logger";
 import { gracefulShutdown } from "./shared/shutdown";
 import { serveHTTP } from "./transport/http/router";
 
+const app = express();
 function main() {
-	const app = express();
 	setupInfras();
 	const server = serveHTTP(app);
 	// Listen for SIGINT (Ctrl+C)
@@ -23,3 +23,5 @@ function main() {
 }
 
 main();
+
+export default app;

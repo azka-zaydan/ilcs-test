@@ -16,19 +16,29 @@ export const updateTaskRequest = z.object({
 	updatedBy: z.string(),
 });
 
-type createTaskRequest = z.infer<typeof createTaskRequest>;
+export type createTaskRequest = z.infer<typeof createTaskRequest>;
 
 export function createReqToModel(req: createTaskRequest) {
 	const createdTime = new Date();
 	const task: Task = {
-		ID: generateV4(),
-		Title: req.title,
-		Description: req.description,
-		Status: req.status,
-		CreatedBy: req.createdBy,
-		CreatedAt: createdTime,
-		UpdatedBy: req.createdBy,
-		UpdatedAt: createdTime,
+		id: generateV4(),
+		title: req.title,
+		description: req.description || null,
+		status: req.status,
+		createdBy: req.createdBy,
+		createdAt: createdTime,
+		updatedBy: req.createdBy,
+		updatedAt: createdTime,
 	};
 	return task;
 }
+
+export type getAllTaskResult = {
+	tasks?: Promise<Task[]>;
+	error?: Error;
+};
+
+export type createTaskResult = {
+	task?: Task;
+	error?: Error;
+};

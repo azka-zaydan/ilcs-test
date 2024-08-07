@@ -1,49 +1,62 @@
 import OracleConn from "../../../infra/oracle";
 import Logger from "../../../shared/logger";
 import { Task } from "../model";
+import { createTaskResult, getAllTaskResult } from "../model/dto";
 
-async function getAllTasks(): Promise<Task[] | undefined> {
+async function getAllTasks(): Promise<getAllTaskResult> {
 	try {
 		const result = await OracleConn.read().execute(getTasksQuery);
-		return result.rows?.map(
-			(row: any) =>
-				({
-					taskId: row[0],
-					title: row[1],
-					description: row[2],
-					status: row[3],
-					createdAt: row[4],
-					createdBy: row[5],
-					updatedAt: row[6],
-					updatedBy: row[7],
-					deletedAt: row[8],
-					deletedBy: row[9],
-				} as unknown as Task)
-		);
+		const res = {
+			tasks: result.rows?.map(
+				(row: any) =>
+					({
+						taskId: row[0],
+						title: row[1],
+						description: row[2],
+						status: row[3],
+						createdAt: row[4],
+						createdBy: row[5],
+						updatedAt: row[6],
+						updatedBy: row[7],
+						deletedAt: row[8],
+						deletedBy: row[9],
+					} as unknown as Task)
+			),
+		} as getAllTaskResult;
+		return res;
 	} catch (error) {
 		Logger.error("Error executing SELECT query: ", error);
-		throw error;
+		return {
+			error: error instanceof Error ? error : new Error(String(error)),
+		};
 	}
 }
 
-async function createTask(task: Task) {
+async function createTask(task: Task): Promise<createTaskResult> {
 	try {
 		const bindParams = {
-			taskId: task.ID,
-			title: task.Title,
-			description: task.Description,
-			status: task.Status,
-			createdAt: task.CreatedAt || new Date(),
-			createdBy: task.CreatedBy,
-			updatedAt: task.UpdatedAt || new Date(),
-			updatedBy: task.UpdatedBy,
-			deletedAt: task.DeletedAt || null,
-			deletedBy: task.DeletedBy || null,
+			taskId: task.id,
+			title: task.title,
+			description: task.description,
+			status: task.status,
+			createdAt: task.createdAt || new Date(),
+			createdBy: task.createdBy,
+			updatedAt: task.updatedAt || new Date(),
+			updatedBy: task.updatedBy,
+			deletedAt: task.deletedAt || null,
+			deletedBy: task.deletedBy || null,
 		};
 		await OracleConn.write().execute(createTaskQuery, bindParams, {
 			autoCommit: true,
 		});
-	} catch (error) {}
+		return {
+			task,
+		};
+	} catch (error) {
+		return {
+			error: error instanceof Error ? error : new Error(String(error)),
+		};
+	}
 }
 
 const getTasksQuery = `SELECT task_id, title, description, status, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by 
@@ -59,6 +72,7 @@ INSERT INTO task (
 
 const taskRepo = {
 	getAllTasks,
+	createTask,
 };
 
 export default taskRepo;
